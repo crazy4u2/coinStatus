@@ -17,7 +17,7 @@ const Home = (props) => {
     try {
       return await axios
         .get(
-          `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency}&order=market_cap_desc&per_page=${countNum}&page=${countPage}&sparkline=false`
+          `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${currency}&order=market_cap_desc&per_page=${countNum}&page=${countPage}&sparkline=false&price_change_percentage=1h%2C24h%2C7d`
         )
         .then((res) => res.data);
     } catch (e) {
@@ -57,7 +57,7 @@ const Home = (props) => {
   }, [drawList]);
 
   return (
-    <div className="wrapper">
+    <Wrap className="wrapper">
       {load && <Loading />}
       <Tabs url={pathname} />
       <div className="setup-panel">
@@ -81,16 +81,75 @@ const Home = (props) => {
           <option value="usd">USD 보기</option>
         </select>
       </div>
-      <ul>
-        {drawList.map((v, i) => (
-          <li key={i}>{v.name}</li>
-        ))}
-      </ul>
+      <table className="">
+        <thead>
+          <tr>
+            <th>자산 - 심볼</th>
+            <th>Price</th>
+            <th>1H</th>
+            <th>24H</th>
+            <th>7D</th>
+            <th>24H vol.</th>
+          </tr>
+        </thead>
+        <tbody>
+          {drawList.map((v, i) => (
+            <tr key={i}>
+              <td>
+                {v.name} - {v.symbol}
+              </td>
+              <td>
+                {currency === "krw" ? "₩" : "$"}
+                {v.current_price.toLocaleString()}
+              </td>
+              <td
+                className={
+                  v.price_change_percentage_1h_in_currency > 0
+                    ? "up"
+                    : v.price_change_percentage_1h_in_currency === 0
+                    ? ""
+                    : "down"
+                }
+              >
+                {v.price_change_percentage_1h_in_currency.toFixed(2)}%
+              </td>
+              <td
+                className={
+                  v.price_change_percentage_24h_in_currency > 0
+                    ? "up"
+                    : v.price_change_percentage_24h_in_currency === 0
+                    ? ""
+                    : "down"
+                }
+              >
+                {v.price_change_percentage_24h_in_currency.toFixed(2)}%
+              </td>
+              <td
+                className={
+                  v.price_change_percentage_7d_in_currency > 0
+                    ? "up"
+                    : v.price_change_percentage_7d_in_currency === 0
+                    ? ""
+                    : "down"
+                }
+              >
+                {v.price_change_percentage_7d_in_currency.toFixed(2)}%
+              </td>
+              <td>
+                {currency === "krw" ? "₩" : "$"}
+                {v.total_volume.toLocaleString()}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       <button onClick={() => setCountPage((countPage) => countPage + 1)}>
         더보기
       </button>
-    </div>
+    </Wrap>
   );
 };
+
+const Wrap = styled.div``;
 
 export default Home;
