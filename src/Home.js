@@ -66,6 +66,7 @@ const Home = (props) => {
             setCountNum(e.target.value);
             setCountPage(1);
           }}
+          value={countNum}
         >
           <option value="10">10</option>
           <option value="30">30</option>
@@ -112,7 +113,10 @@ const Home = (props) => {
                     : "down"
                 }`}
               >
-                {v.price_change_percentage_1h_in_currency.toFixed(2)}%
+                {v.price_change_percentage_1h_in_currency
+                  ? v.price_change_percentage_1h_in_currency.toFixed(2)
+                  : "0"}
+                %
               </td>
               <td
                 className={`num-style percent ${
@@ -123,7 +127,10 @@ const Home = (props) => {
                     : "down"
                 }`}
               >
-                {v.price_change_percentage_24h_in_currency.toFixed(2)}%
+                {v.price_change_percentage_24h_in_currency
+                  ? v.price_change_percentage_24h_in_currency.toFixed(2)
+                  : "0"}
+                %
               </td>
               <td
                 className={`num-style percent ${
@@ -134,7 +141,10 @@ const Home = (props) => {
                     : "down"
                 }`}
               >
-                {v.price_change_percentage_7d_in_currency.toFixed(2)}%
+                {v.price_change_percentage_7d_in_currency
+                  ? v.price_change_percentage_7d_in_currency.toFixed(2)
+                  : "0"}
+                %
               </td>
               <td className="num-style">
                 {currency === "krw" ? "₩" : "$"}
