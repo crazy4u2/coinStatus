@@ -13,10 +13,11 @@ const Home = (props) => {
   const [drawList, setDrawList] = useState([]);
   const [load, setLoad] = useState(true);
 
+  let bookmarkList = localStorage.getItem("bookmark")
+    ? JSON.parse(localStorage.getItem("bookmark"))
+    : [];
+
   const addBookMark = (key) => {
-    let bookmarkList = localStorage.getItem("bookmark")
-      ? JSON.parse(localStorage.getItem("bookmark"))
-      : [];
     if (bookmarkList.includes(key)) {
       const filterd = bookmarkList.filter((v) => v !== key);
       bookmarkList = filterd;
@@ -95,8 +96,12 @@ const Home = (props) => {
           <option value="krw">KRW 보기</option>
           <option value="usd">USD 보기</option>
         </select>
+        <select value={viewCat} onChange={(e) => setViewCat(e.target.value)}>
+          <option value="all">전체보기</option>
+          <option value="fav">북마크보기</option>
+        </select>
       </div>
-      <table className="">
+      <table className={viewCat === "fav" ? "fav-only" : "all"}>
         <thead>
           <tr>
             <th>자산 - 심볼</th>
@@ -108,65 +113,74 @@ const Home = (props) => {
           </tr>
         </thead>
         <tbody>
-          {drawList.map((v, i) => (
-            <tr key={i}>
-              <td>
-                <button onClick={() => addBookMark(v.symbol)}>좋아요</button>
-                <img src={v.image} className="icon" />
-                {v.name} - {v.symbol}
-              </td>
-              <td className="num-style">
-                {currency === "krw" ? "₩" : "$"}
-                {v.current_price.toLocaleString()}
-              </td>
-              <td
-                className={`num-style percent ${
-                  v.price_change_percentage_1h_in_currency > 0
-                    ? "up"
-                    : v.price_change_percentage_24h_in_currency === 0
-                    ? ""
-                    : "down"
-                }`}
+          {drawList.length > 0 ? (
+            drawList.map((v, i) => (
+              <tr
+                key={i}
+                className={bookmarkList.includes(v.symbol) ? "fav" : ""}
               >
-                {v.price_change_percentage_1h_in_currency
-                  ? v.price_change_percentage_1h_in_currency.toFixed(2)
-                  : "0"}
-                %
-              </td>
-              <td
-                className={`num-style percent ${
-                  v.price_change_percentage_24h_in_currency > 0
-                    ? "up"
-                    : v.price_change_percentage_24h_in_currency === 0
-                    ? ""
-                    : "down"
-                }`}
-              >
-                {v.price_change_percentage_24h_in_currency
-                  ? v.price_change_percentage_24h_in_currency.toFixed(2)
-                  : "0"}
-                %
-              </td>
-              <td
-                className={`num-style percent ${
-                  v.price_change_percentage_7d_in_currency > 0
-                    ? "up"
-                    : v.price_change_percentage_7d_in_currency === 0
-                    ? ""
-                    : "down"
-                }`}
-              >
-                {v.price_change_percentage_7d_in_currency
-                  ? v.price_change_percentage_7d_in_currency.toFixed(2)
-                  : "0"}
-                %
-              </td>
-              <td className="num-style">
-                {currency === "krw" ? "₩" : "$"}
-                {v.total_volume.toLocaleString()}
-              </td>
+                <td>
+                  <button onClick={() => addBookMark(v.symbol)}>좋아요</button>
+                  <img src={v.image} className="icon" />
+                  {v.name} - {v.symbol}
+                </td>
+                <td className="num-style">
+                  {currency === "krw" ? "₩" : "$"}
+                  {v.current_price.toLocaleString()}
+                </td>
+                <td
+                  className={`num-style percent ${
+                    v.price_change_percentage_1h_in_currency > 0
+                      ? "up"
+                      : v.price_change_percentage_24h_in_currency === 0
+                      ? ""
+                      : "down"
+                  }`}
+                >
+                  {v.price_change_percentage_1h_in_currency
+                    ? v.price_change_percentage_1h_in_currency.toFixed(2)
+                    : "0"}
+                  %
+                </td>
+                <td
+                  className={`num-style percent ${
+                    v.price_change_percentage_24h_in_currency > 0
+                      ? "up"
+                      : v.price_change_percentage_24h_in_currency === 0
+                      ? ""
+                      : "down"
+                  }`}
+                >
+                  {v.price_change_percentage_24h_in_currency
+                    ? v.price_change_percentage_24h_in_currency.toFixed(2)
+                    : "0"}
+                  %
+                </td>
+                <td
+                  className={`num-style percent ${
+                    v.price_change_percentage_7d_in_currency > 0
+                      ? "up"
+                      : v.price_change_percentage_7d_in_currency === 0
+                      ? ""
+                      : "down"
+                  }`}
+                >
+                  {v.price_change_percentage_7d_in_currency
+                    ? v.price_change_percentage_7d_in_currency.toFixed(2)
+                    : "0"}
+                  %
+                </td>
+                <td className="num-style">
+                  {currency === "krw" ? "₩" : "$"}
+                  {v.total_volume.toLocaleString()}
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="6">내용이 없습니다.</td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
       <button onClick={() => setCountPage((countPage) => countPage + 1)}>
@@ -204,6 +218,14 @@ const Wrap = styled.div`
       text-align: right;
       &:first-child {
         text-align: left;
+      }
+    }
+    &.fav-only {
+      tr {
+        display: none;
+        &.fav {
+          display: table-row;
+        }
       }
     }
   }
