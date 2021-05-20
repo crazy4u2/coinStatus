@@ -13,6 +13,20 @@ const Home = (props) => {
   const [drawList, setDrawList] = useState([]);
   const [load, setLoad] = useState(true);
 
+  const addBookMark = (key) => {
+    let bookmarkList = localStorage.getItem("bookmark")
+      ? JSON.parse(localStorage.getItem("bookmark"))
+      : [];
+    if (bookmarkList.includes(key)) {
+      const filterd = bookmarkList.filter((v) => v !== key);
+      bookmarkList = filterd;
+    } else {
+      bookmarkList.push(key);
+    }
+
+    localStorage.setItem("bookmark", JSON.stringify(bookmarkList));
+  };
+
   const getCoinList = async () => {
     try {
       return await axios
@@ -97,6 +111,7 @@ const Home = (props) => {
           {drawList.map((v, i) => (
             <tr key={i}>
               <td>
+                <button onClick={() => addBookMark(v.symbol)}>좋아요</button>
                 <img src={v.image} className="icon" />
                 {v.name} - {v.symbol}
               </td>
