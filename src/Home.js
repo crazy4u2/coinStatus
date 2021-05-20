@@ -6,7 +6,7 @@ import styled from "styled-components";
 
 const Home = (props) => {
   const { pathname } = props.location;
-  const [countNum, setCountNum] = useState(10); // 50 is default set
+  const [countNum, setCountNum] = useState(50); // 50 is default set
   const [viewCat, setViewCat] = useState("all"); // all is default, all and fav
   const [currency, setCurrency] = useState("krw"); // krw is default, krw and usd
   const [countPage, setCountPage] = useState(1);
@@ -96,46 +96,47 @@ const Home = (props) => {
           {drawList.map((v, i) => (
             <tr key={i}>
               <td>
+                <img src={v.image} className="icon" />
                 {v.name} - {v.symbol}
               </td>
-              <td>
+              <td className="num-style">
                 {currency === "krw" ? "₩" : "$"}
                 {v.current_price.toLocaleString()}
               </td>
               <td
-                className={
+                className={`num-style percent ${
                   v.price_change_percentage_1h_in_currency > 0
                     ? "up"
-                    : v.price_change_percentage_1h_in_currency === 0
+                    : v.price_change_percentage_24h_in_currency === 0
                     ? ""
                     : "down"
-                }
+                }`}
               >
                 {v.price_change_percentage_1h_in_currency.toFixed(2)}%
               </td>
               <td
-                className={
+                className={`num-style percent ${
                   v.price_change_percentage_24h_in_currency > 0
                     ? "up"
                     : v.price_change_percentage_24h_in_currency === 0
                     ? ""
                     : "down"
-                }
+                }`}
               >
                 {v.price_change_percentage_24h_in_currency.toFixed(2)}%
               </td>
               <td
-                className={
+                className={`num-style percent ${
                   v.price_change_percentage_7d_in_currency > 0
                     ? "up"
                     : v.price_change_percentage_7d_in_currency === 0
                     ? ""
                     : "down"
-                }
+                }`}
               >
                 {v.price_change_percentage_7d_in_currency.toFixed(2)}%
               </td>
-              <td>
+              <td className="num-style">
                 {currency === "krw" ? "₩" : "$"}
                 {v.total_volume.toLocaleString()}
               </td>
@@ -150,6 +151,37 @@ const Home = (props) => {
   );
 };
 
-const Wrap = styled.div``;
+const Wrap = styled.div`
+  table {
+    td {
+      width: 15%;
+      color: #000;
+      &.num-style {
+        text-align: right;
+      }
+      &.up {
+        color: red;
+      }
+      &.down {
+        color: blue;
+      }
+      &.percent {
+        width: 10%;
+      }
+      .icon {
+        width: 18px;
+        height: 18px;
+        margin: 0 4px;
+        vertical-align: middle;
+      }
+    }
+    th {
+      text-align: right;
+      &:first-child {
+        text-align: left;
+      }
+    }
+  }
+`;
 
 export default Home;
