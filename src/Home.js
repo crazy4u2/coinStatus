@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import Tabs from "./component/Tabs";
 import Loading from "./component/Loading";
 import styled from "styled-components";
+import { Helmet } from "react-helmet";
 
 const Home = (props) => {
   const { pathname } = props.location;
@@ -11,21 +13,18 @@ const Home = (props) => {
   const [currency, setCurrency] = useState("krw"); // krw is default, krw and usd
   const [countPage, setCountPage] = useState(1);
   const [drawList, setDrawList] = useState([]);
+  const [bmkList, setBmkList] = useState([]);
   const [load, setLoad] = useState(true);
-
-  let bookmarkList = localStorage.getItem("bookmark")
-    ? JSON.parse(localStorage.getItem("bookmark"))
-    : [];
+  const [bmk, setBmk] = useState([]);
+  const [cache, setCache] = useState([]);
 
   const addBookMark = (key) => {
-    if (bookmarkList.includes(key)) {
-      const filterd = bookmarkList.filter((v) => v !== key);
-      bookmarkList = filterd;
+    if (bmk.includes(key)) {
+      const filterd = bmk.filter((v) => v !== key);
+      setBmk(filterd);
     } else {
-      bookmarkList.push(key);
+      setBmk([...bmk, key]);
     }
-
-    localStorage.setItem("bookmark", JSON.stringify(bookmarkList));
   };
 
   const getCoinList = async () => {
@@ -50,18 +49,12 @@ const Home = (props) => {
   };
 
   useEffect(() => {
-    countCoinList();
-  }, []);
-
-  useEffect(() => {
     setLoad(true);
-    console.log("condition changed");
     countCoinList();
   }, [countNum, currency]);
 
   useEffect(() => {
     setLoad(true);
-    console.log("더보기 클릭");
     countCoinList("a");
   }, [countPage]);
 
@@ -71,8 +64,37 @@ const Home = (props) => {
     }, 1000);
   }, [drawList]);
 
+  // useEffect(() => {
+  //   const filterdList = drawList.filter((v, i) => {
+  //     if (v.symbol === bmk[i]) {
+  //       return v;
+  //     }
+  //   });
+
+  //   console.log(filterdList);
+
+  //   setBmkList(filterdList);
+  //   localStorage.setItem("bookmark", JSON.stringify(bmk));
+  // }, [bmk]);
+
+  useEffect(() => {
+    if (viewCat === "fav") {
+      setCache(drawList);
+      setDrawList(bmkList);
+    } else {
+      setDrawList(cache);
+    }
+  }, [viewCat]);
+
   return (
     <Wrap className="wrapper">
+      <Helmet>
+        <title>한강가지 말고 한강뷰에 살자</title>
+        <link
+          rel="icon"
+          href="https://www.coingecko.com/api/documentations/favicon-32x32.png"
+        />
+      </Helmet>
       {load && <Loading />}
       <Tabs url={pathname} />
       <div className="setup-panel">
@@ -103,7 +125,7 @@ const Home = (props) => {
       </div>
       <table className={viewCat === "fav" ? "fav-only" : "all"}>
         <thead>
-          <tr>
+          <tr className="fav">
             <th>자산 - 심볼</th>
             <th>Price</th>
             <th>1H</th>
@@ -115,14 +137,13 @@ const Home = (props) => {
         <tbody>
           {drawList.length > 0 ? (
             drawList.map((v, i) => (
-              <tr
-                key={i}
-                className={bookmarkList.includes(v.symbol) ? "fav" : ""}
-              >
+              <tr key={i} className={bmk.includes(v.symbol) ? "fav" : ""}>
                 <td>
                   <button onClick={() => addBookMark(v.symbol)}>좋아요</button>
-                  <img src={v.image} className="icon" />
-                  {v.name} - {v.symbol}
+                  <Link to={`/details/${v.id}`}>
+                    <img src={v.image} className="icon" />
+                    {v.name} - {v.symbol}
+                  </Link>
                 </td>
                 <td className="num-style">
                   {currency === "krw" ? "₩" : "$"}
@@ -177,7 +198,7 @@ const Home = (props) => {
               </tr>
             ))
           ) : (
-            <tr>
+            <tr className="fav">
               <td colSpan="6">내용이 없습니다.</td>
             </tr>
           )}
