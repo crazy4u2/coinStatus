@@ -104,15 +104,18 @@ const Details = ({ match }) => {
         <link rel="icon" href={coinInfo.thumb} />
       </Helmet>
       {Object.keys(coinInfo).length > 0 ? (
-        <>
-          <select
-            value={viewCurr}
-            onChange={(e) => changeCurreny(e.target.value)}
-          >
-            <option value="krw">KRW 보기</option>
-            <option value="usd">USD 보기</option>
-          </select>
-          <WrapBox>
+        <WrapBox>
+          <div className="top-box">
+            <div className="option-panel">
+              <select
+                className="currency-change"
+                value={viewCurr}
+                onChange={(e) => changeCurreny(e.target.value)}
+              >
+                <option value="krw">KRW 보기</option>
+                <option value="usd">USD 보기</option>
+              </select>
+            </div>
             <h1>
               <img src={coinInfo.thumb} alt={`${coinInfo.name} icon`} />
               {coinInfo.name} ({coinInfo.symbol.toUpperCase()})
@@ -187,47 +190,164 @@ const Details = ({ match }) => {
             </div>
             <div className="calc-box">
               <h2>가격 계산</h2>
-              <dl>
-                <dt>{coinInfo.symbol.toUpperCase()}</dt>
-                <dd>
-                  <input
-                    type="number"
-                    value={coinPrice}
-                    onChange={(e) => checkKey(e.target.value, "a")}
-                  />
-                </dd>
-              </dl>
-              <dl>
-                <dt>{viewCurr.toUpperCase()}</dt>
-                <dd>
-                  <input
-                    type="text"
-                    value={currencyPrice}
-                    onChange={(e) => checkKey(e.target.value, "b")}
-                  />
-                </dd>
-              </dl>
+              <div className="calc-area">
+                <dl>
+                  <dt>{coinInfo.symbol.toUpperCase()}</dt>
+                  <dd>
+                    <input
+                      type="number"
+                      value={coinPrice}
+                      onChange={(e) => checkKey(e.target.value, "a")}
+                    />
+                  </dd>
+                </dl>
+                <dl>
+                  <dt>{viewCurr.toUpperCase()}</dt>
+                  <dd>
+                    <input
+                      type="text"
+                      value={currencyPrice}
+                      onChange={(e) => checkKey(e.target.value, "b")}
+                    />
+                  </dd>
+                </dl>
+              </div>
             </div>
-          </WrapBox>
-          <button onClick={() => setShowDesc(!showDesc)}>
-            설명{showDesc ? "닫기" : "보기"}
-          </button>
+          </div>
+          <div className="btm-box">
+            <button onClick={() => setShowDesc(!showDesc)}>
+              설명{showDesc ? "닫기" : "보기"}
+            </button>
+          </div>
           {showDesc && (
             <div
+              className="desc-box"
               dangerouslySetInnerHTML={{ __html: coinInfo.description }}
             ></div>
           )}
-        </>
+        </WrapBox>
       ) : (
-        <p>코인 이름을 확인하세요</p>
+        <p>코인 이름을 확인하세요. 혹시 스캠일지도 모르니까 잘 찾아봐요.</p>
       )}
     </>
   );
 };
 
 const WrapBox = styled.div`
+  * {
+    box-sizing: border-box;
+  }
+  p,
+  h2 {
+    margin: 0%;
+  }
   img {
     vertical-align: middle;
+  }
+  padding: 0 20%;
+  .top-box {
+    position: relative;
+  }
+  .option-panel {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  .mid-box {
+    display: flex;
+    flex-direction: row;
+    place-content: center space-between;
+    align-items: center;
+    .txt-info {
+      border-collapse: collapse;
+      width: 50%;
+      th {
+        color: #000;
+        border: 1px solid #000;
+        width: 40%;
+        height: 60px;
+        background: #ddd;
+      }
+      td {
+        border: 1px solid #000;
+      }
+    }
+    .numberic-info {
+      width: 30%;
+      text-align: right;
+      .top-section {
+        display: flex;
+        flex-direction: row;
+        place-content: center flex-end;
+        align-items: center;
+        .top-lh {
+          padding: 0 10% 0 0;
+          .current-price {
+            font-size: 20px;
+            font-weight: bold;
+          }
+          .root-point {
+            color: gray;
+          }
+        }
+        .top-rh {
+          .percent-24h-top {
+            font-weight: bold;
+            font-size: 16px;
+          }
+          > p {
+            &.up {
+              color: red;
+            }
+            &.down {
+              color: blue;
+            }
+          }
+        }
+      }
+      .btm-section {
+        display: flex;
+        flex-direction: row;
+        place-content: center flex-end;
+        align-items: center;
+        margin: 10% 0 0 0;
+        .btm-lh {
+          padding: 0 10% 0 0;
+        }
+      }
+    }
+  }
+  .btm-box {
+    padding: 2% 0;
+    text-align: center;
+  }
+  .desc-box {
+    line-height: 1.4em;
+    p {
+      margin: 1% 0;
+    }
+  }
+  .calc-box {
+    width: 100%;
+    padding: 5%;
+    display: flex;
+    flex-direction: column;
+    place-content: flex-start center;
+    background: #ddd;
+    margin: 10% 0 0 0;
+    .calc-area {
+      display: flex;
+      flex-direction: row;
+      place-content: center;
+      dl {
+        display: flex;
+        flex-direction: row;
+        place-content: center;
+        &:last-child {
+          margin-left: 10%;
+        }
+      }
+    }
   }
 `;
 
