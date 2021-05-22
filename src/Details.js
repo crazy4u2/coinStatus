@@ -26,6 +26,7 @@ const Details = ({ match }) => {
   const [showDesc, setShowDesc] = useState(false);
   const [coinPrice, setCoinPrice] = useState(0);
   const [currencyPrice, setCurrencyPrice] = useState(0);
+  const [load, setLoad] = useState(true);
 
   const changeCurreny = (cur) => {
     if (cur === "usd") {
@@ -88,21 +89,27 @@ const Details = ({ match }) => {
           market_cap_change_24h:
             res.data.market_data.market_cap_change_percentage_24h,
         });
+        setTimeout(() => {
+          setLoad(false);
+        }, 500);
       })
       .catch((err) => {
         setCoinInfo({});
+        setLoad(false);
       });
   };
 
   useEffect(() => {
     getCoinInfo(coin);
   }, []);
+
   return (
     <>
       <Helmet>
         <title>{`코인 상세 페이지 - ${coinInfo.name}`}</title>
         <link rel="icon" href={coinInfo.thumb} />
       </Helmet>
+      {load && <Loading />}
       {Object.keys(coinInfo).length > 0 ? (
         <WrapBox>
           <div className="top-box">
@@ -227,7 +234,12 @@ const Details = ({ match }) => {
           )}
         </WrapBox>
       ) : (
-        <p>코인 이름을 확인하세요. 혹시 스캠일지도 모르니까 잘 찾아봐요.</p>
+        <WrongWrap>
+          <p>
+            코인 이름을 확인하세요. 혹시 스캠일지도 모르니까 잘 찾아봐요. 한강은
+            가지 마시고요
+          </p>
+        </WrongWrap>
       )}
     </>
   );
@@ -349,6 +361,14 @@ const WrapBox = styled.div`
       }
     }
   }
+`;
+
+const WrongWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  place-content: center;
+  align-items: center;
+  height: 100%;
 `;
 
 export default Details;
