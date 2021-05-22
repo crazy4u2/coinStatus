@@ -221,23 +221,28 @@ const Details = ({ match }) => {
               </div>
             </div>
           </div>
-          <div className="btm-box">
-            <button onClick={() => setShowDesc(!showDesc)}>
-              설명{showDesc ? "닫기" : "보기"}
-            </button>
-          </div>
-          {showDesc && (
-            <div
-              className="desc-box"
-              dangerouslySetInnerHTML={{ __html: coinInfo.description }}
-            ></div>
+          {coinInfo.description && (
+            <>
+              <div className="btm-box">
+                <button onClick={() => setShowDesc(!showDesc)}>
+                  설명{showDesc ? "닫기" : "보기"}
+                </button>
+              </div>
+              {showDesc && (
+                <div
+                  className="desc-box"
+                  dangerouslySetInnerHTML={{ __html: coinInfo.description }}
+                ></div>
+              )}
+            </>
           )}
         </WrapBox>
       ) : (
         <WrongWrap>
           <p>
-            코인 이름을 확인하세요. 혹시 스캠일지도 모르니까 잘 찾아봐요. 한강은
-            가지 마시고요
+            코인 이름을 확인하세요. 혹시 스캠일지도 모르니까 잘 찾아봐요.
+            <br />
+            스캠같다고 섵부르게 한강은가지 마시고요
           </p>
         </WrongWrap>
       )}
