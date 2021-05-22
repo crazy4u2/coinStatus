@@ -27,9 +27,17 @@ const Details = ({ match }) => {
   const [coinPrice, setCoinPrice] = useState(0);
   const [currencyPrice, setCurrencyPrice] = useState(0);
 
+  const changeCurreny = (cur) => {
+    if (cur === "usd") {
+      setCurrencyPrice((currencyPrice / exchangeRate).toFixed(0));
+    } else if (cur === "krw") {
+      setCurrencyPrice(currencyPrice * exchangeRate);
+    }
+    setViewCurr(cur);
+  };
+
   const checkKey = (val, key) => {
     const regExp8digits = /^\d*.?\d{0,8}$/;
-    const regExpNumberOnly = /^[0-9]/;
     if (key === "a") {
       if (regExp8digits.test(val)) {
         setCoinPrice(val);
@@ -99,7 +107,7 @@ const Details = ({ match }) => {
         <>
           <select
             value={viewCurr}
-            onChange={(e) => setViewCurr(e.target.value)}
+            onChange={(e) => changeCurreny(e.target.value)}
           >
             <option value="krw">KRW 보기</option>
             <option value="usd">USD 보기</option>
@@ -194,11 +202,7 @@ const Details = ({ match }) => {
                 <dd>
                   <input
                     type="text"
-                    value={
-                      viewCurr === "krw"
-                        ? currencyPrice
-                        : (currencyPrice / exchangeRate).toFixed(0)
-                    }
+                    value={currencyPrice}
                     onChange={(e) => checkKey(e.target.value, "b")}
                   />
                 </dd>
