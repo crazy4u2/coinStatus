@@ -79,10 +79,10 @@ const Home = (props) => {
 
   useEffect(() => {
     countCoinList();
-    const a = JSON.parse(localStorage.getItem("bookmark"))
+    const loadBookmark = JSON.parse(localStorage.getItem("bookmark"))
       ? JSON.parse(localStorage.getItem("bookmark"))
       : [];
-    setBookMarkList(a);
+    setBookMarkList(loadBookmark);
   }, []);
 
   useEffect(() => {

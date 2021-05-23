@@ -5,6 +5,7 @@ import styled from "styled-components";
 import Loading from "./component/Loading";
 import trendCheck from "./utils/TrendCheck";
 import currencyTxt from "./utils/CurrencyTxt";
+import Toast from "./component/Toast";
 
 const exchangeRate = 1100;
 // const deleteComma = (val) => {
@@ -27,6 +28,42 @@ const Details = ({ match }) => {
   const [coinPrice, setCoinPrice] = useState(1);
   const [currencyPrice, setCurrencyPrice] = useState(0);
   const [load, setLoad] = useState(true);
+  const [bookMarkList, setBookMarkList] = useState([]);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState({
+    msg: "",
+    x: "",
+    y: "",
+  });
+
+  const toast = () => {
+    setShowToast(true);
+    setTimeout(() => {
+      setShowToast(false);
+    }, 1500);
+  };
+
+  const addBookMark = (key, e) => {
+    console.log(e);
+    const { clientX, clientY } = e;
+    if (bookMarkList.includes(key)) {
+      const filterd = bookMarkList.filter((v) => v !== key);
+      setBookMarkList(filterd);
+      setToastMsg({
+        msg: "삭제",
+        clientX: clientX + 20,
+        clientY: clientY + 20,
+      });
+    } else {
+      setBookMarkList([...bookMarkList, key]);
+      setToastMsg({
+        msg: "추가",
+        clientX: clientX + 20,
+        clientY: clientY + 20,
+      });
+    }
+    toast();
+  };
 
   const changeCurreny = (cur) => {
     if (cur === "usd") {
@@ -102,7 +139,16 @@ const Details = ({ match }) => {
 
   useEffect(() => {
     getCoinInfo(coin);
+    const loadBookmark = JSON.parse(localStorage.getItem("bookmark"))
+      ? JSON.parse(localStorage.getItem("bookmark"))
+      : [];
+    setBookMarkList(loadBookmark);
   }, []);
+
+  useEffect(() => {
+    console.log("aaa");
+    localStorage.setItem("bookmark", JSON.stringify(bookMarkList));
+  }, [bookMarkList]);
 
   return (
     <>
@@ -125,6 +171,11 @@ const Details = ({ match }) => {
               </select>
             </div>
             <h1>
+              <button onClick={(e) => addBookMark(coinInfo.symbol, e)}>
+                {bookMarkList.includes(coinInfo.symbol)
+                  ? "좋아요 했음"
+                  : "좋아요"}
+              </button>
               <img src={coinInfo.thumb} alt={`${coinInfo.name} icon`} />
               {coinInfo.name} ({coinInfo.symbol.toUpperCase()})
             </h1>
@@ -236,6 +287,13 @@ const Details = ({ match }) => {
                 ></div>
               )}
             </>
+          )}
+          {showToast && (
+            <Toast
+              msg={toastMsg.msg}
+              x={toastMsg.clientX}
+              y={toastMsg.clientY}
+            />
           )}
         </WrapBox>
       ) : (
