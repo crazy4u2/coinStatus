@@ -6,6 +6,8 @@ import Loading from "./component/Loading";
 import styled from "styled-components";
 import { Helmet } from "react-helmet";
 import Toast from "./component/Toast";
+import trendCheck from "./utils/TrendCheck";
+import currencyTxt from "./utils/CurrencyTxt";
 
 const Home = (props) => {
   const { pathname } = props.location;
@@ -196,17 +198,13 @@ const Home = (props) => {
                   </Link>
                 </td>
                 <td className="num-style">
-                  {currency === "krw" ? "₩" : "$"}
+                  {currencyTxt(currency)}
                   {v.current_price.toLocaleString()}
                 </td>
                 <td
-                  className={`num-style percent ${
-                    v.price_change_percentage_1h_in_currency > 0
-                      ? "up"
-                      : v.price_change_percentage_24h_in_currency === 0
-                      ? ""
-                      : "down"
-                  }`}
+                  className={`num-style percent ${trendCheck(
+                    v.price_change_percentage_1h_in_currency
+                  )}`}
                 >
                   {v.price_change_percentage_1h_in_currency
                     ? v.price_change_percentage_1h_in_currency.toFixed(2)
@@ -214,13 +212,9 @@ const Home = (props) => {
                   %
                 </td>
                 <td
-                  className={`num-style percent ${
-                    v.price_change_percentage_24h_in_currency > 0
-                      ? "up"
-                      : v.price_change_percentage_24h_in_currency === 0
-                      ? ""
-                      : "down"
-                  }`}
+                  className={`num-style percent ${trendCheck(
+                    v.price_change_percentage_24h_in_currency
+                  )}`}
                 >
                   {v.price_change_percentage_24h_in_currency
                     ? v.price_change_percentage_24h_in_currency.toFixed(2)
@@ -228,13 +222,9 @@ const Home = (props) => {
                   %
                 </td>
                 <td
-                  className={`num-style percent ${
-                    v.price_change_percentage_7d_in_currency > 0
-                      ? "up"
-                      : v.price_change_percentage_7d_in_currency === 0
-                      ? ""
-                      : "down"
-                  }`}
+                  className={`num-style percent ${trendCheck(
+                    v.price_change_percentage_7d_in_currency
+                  )}`}
                 >
                   {v.price_change_percentage_7d_in_currency
                     ? v.price_change_percentage_7d_in_currency.toFixed(2)
@@ -242,7 +232,7 @@ const Home = (props) => {
                   %
                 </td>
                 <td className="num-style">
-                  {currency === "krw" ? "₩" : "$"}
+                  {currencyTxt(currency)}
                   {v.total_volume.toLocaleString()}
                 </td>
               </tr>
