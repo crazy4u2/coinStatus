@@ -44,7 +44,6 @@ const Details = ({ match }) => {
   };
 
   const addBookMark = (key, e) => {
-    console.log(e);
     const { clientX, clientY } = e;
     if (bookMarkList.includes(key)) {
       const filterd = bookMarkList.filter((v) => v !== key);
@@ -146,7 +145,6 @@ const Details = ({ match }) => {
   }, []);
 
   useEffect(() => {
-    console.log("aaa");
     localStorage.setItem("bookmark", JSON.stringify(bookMarkList));
   }, [bookMarkList]);
 
