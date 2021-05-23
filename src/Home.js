@@ -5,6 +5,7 @@ import Tabs from "./component/Tabs";
 import Loading from "./component/Loading";
 import styled from "styled-components";
 import { Helmet } from "react-helmet";
+import Toast from "./component/Toast";
 
 const Home = (props) => {
   const { pathname } = props.location;
@@ -17,7 +18,11 @@ const Home = (props) => {
   const [bookMarkList, setBookMarkList] = useState([]);
   const [cache, setCache] = useState([]);
   const [showToast, setShowToast] = useState(false);
-  const [drawBookmark, setDrawBookmark] = useState([]);
+  const [toastMsg, setToastMsg] = useState({
+    msg: "",
+    x: "",
+    y: "",
+  });
 
   const blockFirstMount0 = useRef(true);
   const blockFirstMount1 = useRef(true);
@@ -27,15 +32,26 @@ const Home = (props) => {
     setShowToast(true);
     setTimeout(() => {
       setShowToast(false);
-    }, 500);
+    }, 1500);
   };
 
-  const addBookMark = (key) => {
+  const addBookMark = (key, e) => {
+    const { clientX, clientY } = e;
     if (bookMarkList.includes(key)) {
       const filterd = bookMarkList.filter((v) => v !== key);
       setBookMarkList(filterd);
+      setToastMsg({
+        msg: "삭제",
+        clientX,
+        clientY,
+      });
     } else {
       setBookMarkList([...bookMarkList, key]);
+      setToastMsg({
+        msg: "추가",
+        clientX,
+        clientY,
+      });
     }
     toast();
   };
@@ -63,16 +79,16 @@ const Home = (props) => {
 
   useEffect(() => {
     countCoinList();
+    const a = JSON.parse(localStorage.getItem("bookmark"))
+      ? JSON.parse(localStorage.getItem("bookmark"))
+      : [];
+    setBookMarkList(a);
   }, []);
 
   useEffect(() => {
     setTimeout(() => {
       setLoad(false);
     }, 1000);
-
-    if (drawList.length === 0) {
-      setDrawBookmark([]);
-    }
   }, [drawList]);
 
   useEffect(() => {
@@ -99,18 +115,17 @@ const Home = (props) => {
       return;
     }
     localStorage.setItem("bookmark", JSON.stringify(bookMarkList));
-    const a = drawList.filter((v) => bookMarkList.includes(v.symbol));
+    const renderList = drawList.filter((v) => bookMarkList.includes(v.symbol));
     if (viewCat === "fav") {
-      setDrawList(a);
-    } else {
-      setDrawBookmark(a);
+      setDrawList(renderList);
     }
   }, [bookMarkList]);
 
   useEffect(() => {
+    const renderList = drawList.filter((v) => bookMarkList.includes(v.symbol));
     if (viewCat === "fav") {
       setCache(drawList);
-      setDrawList(drawBookmark);
+      setDrawList(renderList);
     } else {
       setDrawList(cache);
     }
@@ -172,7 +187,9 @@ const Home = (props) => {
                 className={bookMarkList.includes(v.symbol) ? "fav" : ""}
               >
                 <td>
-                  <button onClick={() => addBookMark(v.symbol)}>좋아요</button>
+                  <button onClick={(e) => addBookMark(v.symbol, e)}>
+                    {bookMarkList.includes(v.symbol) ? "좋아요 했음" : "좋아요"}
+                  </button>
                   <Link to={`/details/${v.id}`}>
                     <img src={v.image} className="icon" />
                     {v.name} - {v.symbol}
@@ -242,11 +259,15 @@ const Home = (props) => {
           더보기
         </button>
       )}
+      {showToast && (
+        <Toast msg={toastMsg.msg} x={toastMsg.clientX} y={toastMsg.clientY} />
+      )}
     </Wrap>
   );
 };
 
 const Wrap = styled.div`
+  position: relative;
   table {
     td {
       width: 15%;
