@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Tabs from "./component/Tabs";
@@ -13,18 +13,31 @@ const Home = (props) => {
   const [currency, setCurrency] = useState("krw"); // krw is default, krw and usd
   const [countPage, setCountPage] = useState(1);
   const [drawList, setDrawList] = useState([]);
-  const [bmkList, setBmkList] = useState([]);
   const [load, setLoad] = useState(true);
-  const [bmk, setBmk] = useState([]);
+  const [bookMarkList, setBookMarkList] = useState([]);
   const [cache, setCache] = useState([]);
+  const [showToast, setShowToast] = useState(false);
+  const [drawBookmark, setDrawBookmark] = useState([]);
+
+  const blockFirstMount0 = useRef(true);
+  const blockFirstMount1 = useRef(true);
+  const blockFirstMount2 = useRef(true);
+
+  const toast = () => {
+    setShowToast(true);
+    setTimeout(() => {
+      setShowToast(false);
+    }, 500);
+  };
 
   const addBookMark = (key) => {
-    if (bmk.includes(key)) {
-      const filterd = bmk.filter((v) => v !== key);
-      setBmk(filterd);
+    if (bookMarkList.includes(key)) {
+      const filterd = bookMarkList.filter((v) => v !== key);
+      setBookMarkList(filterd);
     } else {
-      setBmk([...bmk, key]);
+      setBookMarkList([...bookMarkList, key]);
     }
+    toast();
   };
 
   const getCoinList = async () => {
@@ -41,7 +54,7 @@ const Home = (props) => {
 
   const countCoinList = async (flag) => {
     const coin = await getCoinList();
-    if (flag) {
+    if (flag === "nextCount") {
       setDrawList([...drawList, ...coin]);
     } else {
       setDrawList(coin);
@@ -49,38 +62,55 @@ const Home = (props) => {
   };
 
   useEffect(() => {
-    setLoad(true);
     countCoinList();
-  }, [countNum, currency]);
-
-  useEffect(() => {
-    setLoad(true);
-    countCoinList("a");
-  }, [countPage]);
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {
       setLoad(false);
     }, 1000);
+
+    if (drawList.length === 0) {
+      setDrawBookmark([]);
+    }
   }, [drawList]);
 
-  // useEffect(() => {
-  //   const filterdList = drawList.filter((v, i) => {
-  //     if (v.symbol === bmk[i]) {
-  //       return v;
-  //     }
-  //   });
+  useEffect(() => {
+    if (blockFirstMount0.current) {
+      blockFirstMount0.current = false;
+      return;
+    }
+    setLoad(true);
+    countCoinList();
+  }, [countNum, currency]);
 
-  //   console.log(filterdList);
+  useEffect(() => {
+    if (blockFirstMount1.current) {
+      blockFirstMount1.current = false;
+      return;
+    }
+    setLoad(true);
+    countCoinList("nextCount");
+  }, [countPage]);
 
-  //   setBmkList(filterdList);
-  //   localStorage.setItem("bookmark", JSON.stringify(bmk));
-  // }, [bmk]);
+  useEffect(() => {
+    if (blockFirstMount2.current) {
+      blockFirstMount2.current = false;
+      return;
+    }
+    localStorage.setItem("bookmark", JSON.stringify(bookMarkList));
+    const a = drawList.filter((v) => bookMarkList.includes(v.symbol));
+    if (viewCat === "fav") {
+      setDrawList(a);
+    } else {
+      setDrawBookmark(a);
+    }
+  }, [bookMarkList]);
 
   useEffect(() => {
     if (viewCat === "fav") {
       setCache(drawList);
-      setDrawList(bmkList);
+      setDrawList(drawBookmark);
     } else {
       setDrawList(cache);
     }
@@ -137,7 +167,10 @@ const Home = (props) => {
         <tbody>
           {drawList.length > 0 ? (
             drawList.map((v, i) => (
-              <tr key={i} className={bmk.includes(v.symbol) ? "fav" : ""}>
+              <tr
+                key={i}
+                className={bookMarkList.includes(v.symbol) ? "fav" : ""}
+              >
                 <td>
                   <button onClick={() => addBookMark(v.symbol)}>좋아요</button>
                   <Link to={`/details/${v.id}`}>
@@ -204,9 +237,11 @@ const Home = (props) => {
           )}
         </tbody>
       </table>
-      <button onClick={() => setCountPage((countPage) => countPage + 1)}>
-        더보기
-      </button>
+      {viewCat === "all" && (
+        <button onClick={() => setCountPage((countPage) => countPage + 1)}>
+          더보기
+        </button>
+      )}
     </Wrap>
   );
 };
