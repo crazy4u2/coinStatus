@@ -24,7 +24,7 @@ const Details = ({ match }) => {
   const [coinInfo, setCoinInfo] = useState({});
   const [viewCurr, setViewCurr] = useState("krw");
   const [showDesc, setShowDesc] = useState(false);
-  const [coinPrice, setCoinPrice] = useState(0);
+  const [coinPrice, setCoinPrice] = useState(1);
   const [currencyPrice, setCurrencyPrice] = useState(0);
   const [load, setLoad] = useState(true);
 
@@ -89,6 +89,7 @@ const Details = ({ match }) => {
           market_cap_change_24h:
             res.data.market_data.market_cap_change_percentage_24h,
         });
+        setCurrencyPrice(res.data.market_data.current_price.krw);
         setTimeout(() => {
           setLoad(false);
         }, 500);
